@@ -10,11 +10,11 @@ compression_level = 2
 [s3_api]
 s3_region = "us-east-1"
 api_bind_addr = "[::]:3900"
-root_domain = "garage.aws.casjay.dev"
+root_domain = "casjay.casa"
 
 [s3_web]
 bind_addr = "[::]:3902"
-root_domain = "web.aws.casjay.dev"
+root_domain = "storage.casjay.casa"
 index = "index.html"
 
 [admin]
