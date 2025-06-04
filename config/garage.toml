@@ -1,0 +1,24 @@
+db_engine = "lmdb"
+data_dir = "/var/lib/garage/data"
+metadata_dir = "/var/lib/garage/meta"
+
+replication_mode = "none"
+rpc_bind_addr = "[::]:3901"
+rpc_public_addr = "[::]:3901"
+compression_level = 2
+
+[s3_api]
+s3_region = "us-east-1"
+api_bind_addr = "[::]:3900"
+root_domain = "casjay.casa"
+
+[s3_web]
+bind_addr = "[::]:3902"
+root_domain = "storage.casjay.casa"
+index = "index.html"
+
+[admin]
+api_bind_addr = "[::]:3903"
+
+[k2v_api]
+api_bind_addr = "[::]:3904"
