@@ -1,0 +1,61 @@
+# nginx proxy address - http://172.17.0.1:59094
+
+name: garage
+x-logging: &default-logging
+  options:
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
+
+services:
+  manager:
+    image: cloudlena/s3manager:latest
+    container_name: garage-manager
+    domainname: ${BASE_DOMAIN_NAME:-}
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    environment:
+      TZ: ${TZ:-America/New_York}
+      USE_SSL: false
+      ENDPOINT: garage-server:3900
+      ACCESS_KEY_ID: ${S3_ACCESS_KEY:-changeme_s3_access_key}
+      SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-changeme_s3_secret_key}
+    ports:
+      - '172.17.0.1:59094:8080'
+    depends_on:
+      - server
+    networks:
+      - garage
+
+  server:
+    image: dxflrs/garage:bf4691d98afe348e528ee24e26b06c325cca35d0
+    container_name: garage-server
+    hostname: garage
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    environment:
+      TZ: ${TZ:-America/New_York}
+      RUST_LOG: garage=info
+      GARAGE_ADMIN_TOKEN: ${DB_ADMIN_PASS:-changeme_admin_token_min_32_chars}
+      GARAGE_METRICS_TOKEN: ${APP_API_TOKEN:-changeme_metrics_token_min_32_chars}
+      GARAGE_RPC_SECRET: ${RPC_SECRET:-changeme_rpc_secret_min_64_chars}
+    ports:
+      - '3900:3900'
+      - '3901:3901'
+      - '3902:3902'
+      - '3903:3903'
+      - '3904:3904'
+    volumes:
+      - './rootfs/config/garage.toml:/etc/garage.toml'
+      - './rootfs/data/garage:/var/lib/garage/data'
+      - './rootfs/config/garage:/var/lib/garage/meta'
+    networks:
+      - garage
+
+networks:
+  garage:
+    name: garage
+    external: false
