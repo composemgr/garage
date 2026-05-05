@@ -49,9 +49,9 @@ services:
       - '3903:3903'
       - '3904:3904'
     volumes:
-      - './rootfs/config/garage.toml:/etc/garage.toml'
-      - './rootfs/data/garage:/var/lib/garage/data'
-      - './rootfs/config/garage:/var/lib/garage/meta'
+      - './volumes/config/garage.toml:/etc/garage.toml'
+      - './volumes/data/garage:/var/lib/garage/data'
+      - './volumes/config/garage:/var/lib/garage/meta'
     networks:
       - garage
 
