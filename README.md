@@ -48,9 +48,9 @@ See `docker-compose.yaml` for complete list of configurable options.
 
 ## 📂 Volumes
 
-- `./rootfs/config/garage.toml` - Data storage
-- `./rootfs/data/garage` - Data storage
-- `./rootfs/config/garage` - Data storage
+- `./volumes/config/garage.toml` - Data storage
+- `./volumes/data/garage` - Data storage
+- `./volumes/config/garage` - Data storage
 
 ## 🔐 Security
 
