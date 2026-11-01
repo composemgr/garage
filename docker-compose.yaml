@@ -1,4 +1,4 @@
-# nginx proxy address - http://172.17.0.1:59094
+# nginx proxy address - http://172.17.0.1:64182
 
 name: garage
 x-logging: &default-logging
@@ -8,7 +8,7 @@ x-logging: &default-logging
   driver: json-file
 
 services:
-  manager:
+  app:
     image: cloudlena/s3manager:latest
     container_name: garage-manager
     domainname: ${BASE_DOMAIN_NAME:-example.com}
@@ -20,86 +20,43 @@ services:
       TZ: ${TZ:-America/New_York}
       USE_SSL: "false"
       ENDPOINT: garage-server:3900
-      ACCESS_KEY_ID: ${S3_ACCESS_KEY:-changeme_s3_access_key}
-      SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-changeme_s3_secret_key}
+      ACCESS_KEY_ID: ${S3_ACCESS_KEY:-replace-with-a-random-password}
+      SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-replace-with-a-random-password}
       CONTAINER_NAME: garage-manager
       HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
     ports:
-      - '172.17.0.1:59094:8080'
+      - '172.17.0.1:64182:8080'
     depends_on:
-      - server
+      - garage-server
     networks:
       - garage
-      - proxy
-      - cloudflare
-    labels:
-      - 'traefik.enable=true'
-      - 'cloudflare.enable=true'
-      - 'traefik.docker.network=proxy'
-      - 'cloudflare.service=http://garage-manager:8080'
-      - 'cloudflare.hostname=garage.${CLOUDFLARE_ZONE_NAME:-}'
-      - 'traefik.http.routers.garage-manager.entrypoints=http'
-      - 'traefik.http.routers.garage-manager-secure.tls=true'
-      - 'traefik.http.routers.garage-manager.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
-      - 'traefik.http.middlewares.garage-manager-https-redirect.redirectscheme.scheme=https'
-      - 'traefik.http.routers.garage-manager.middlewares=garage-manager-https-redirect'
-      - 'traefik.http.routers.garage-manager-secure.entrypoints=https'
-      - 'traefik.http.routers.garage-manager-secure.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
-      - 'traefik.http.routers.garage-manager-secure.tls.certresolver=cloudflare'
-      - 'traefik.http.routers.garage-manager-secure.service=garage-manager'
-      - 'traefik.http.services.garage-manager.loadbalancer.server.port=8080'
 
-  server:
+  garage-server:
     image: dxflrs/garage:latest
     container_name: garage-server
-    hostname: garage
+    domainname: ${BASE_DOMAIN_NAME:-example.com}
+    hostname: garage-server
     restart: always
     pull_policy: always
     logging: *default-logging
     environment:
       TZ: ${TZ:-America/New_York}
       RUST_LOG: garage=info
-      GARAGE_ADMIN_TOKEN: ${DB_ADMIN_PASS:-changeme_admin_password}
-      GARAGE_METRICS_TOKEN: ${APP_API_TOKEN:-changeme_metrics_token_min_32_chars}
-      GARAGE_RPC_SECRET: ${RPC_SECRET:-changeme_rpc_secret_min_64_chars}
+      GARAGE_ADMIN_TOKEN: ${DB_ADMIN_PASS:-replace-with-a-random-password}
+      GARAGE_METRICS_TOKEN: ${APP_API_TOKEN:-replace-with-a-random-password}
+      GARAGE_RPC_SECRET: ${RPC_SECRET:-replace-with-a-random-password}
       CONTAINER_NAME: garage-server
       HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
     ports:
-      - '172.17.0.1:3900:3900'
-      - '172.17.0.1:3901:3901'
-      - '172.17.0.1:3902:3902'
-      - '172.17.0.1:3903:3903'
-      - '172.17.0.1:3904:3904'
+      - '3900:3900'
     volumes:
-      - './volumes/config/garage.toml:/etc/garage.toml'
+      - './config/garage.toml:/etc/garage.toml:ro'
       - './volumes/data/garage:/var/lib/garage/data'
       - './volumes/config/garage:/var/lib/garage/meta'
     networks:
       - garage
-      - proxy
-      - cloudflare
-    labels:
-      - 'traefik.enable=true'
-      - 'cloudflare.enable=true'
-      - 'traefik.docker.network=proxy'
-      - 'cloudflare.service=http://garage-server:3900'
-      - 'cloudflare.hostname=garage.${CLOUDFLARE_ZONE_NAME:-}'
-      - 'traefik.http.routers.garage-server.entrypoints=http'
-      - 'traefik.http.routers.garage-server-secure.tls=true'
-      - 'traefik.http.routers.garage-server.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
-      - 'traefik.http.middlewares.garage-server-https-redirect.redirectscheme.scheme=https'
-      - 'traefik.http.routers.garage-server.middlewares=garage-server-https-redirect'
-      - 'traefik.http.routers.garage-server-secure.entrypoints=https'
-      - 'traefik.http.routers.garage-server-secure.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
-      - 'traefik.http.routers.garage-server-secure.tls.certresolver=cloudflare'
-      - 'traefik.http.routers.garage-server-secure.service=garage-server'
-      - 'traefik.http.services.garage-server.loadbalancer.server.port=3900'
 
 networks:
   garage:
     name: garage
     external: false
-  proxy:
-    external: true
-  cloudflare:
-    external: true
