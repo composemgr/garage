@@ -39,7 +39,7 @@ composemgr install garage
 TZ=America/New_York
 BASE_HOST_NAME=garage.example.com
 DB_ADMIN_PASS=replace-with-a-random-password
-RPC_SECRET=replace-with-a-random-password
+RPC_SECRET=replace-with-64-random-hex-characters
 S3_ACCESS_KEY=replace-with-a-random-password
 S3_SECRET_KEY=replace-with-a-random-password
 ```
@@ -108,7 +108,7 @@ to drive `garage` commands against the local admin socket.
 
 ## 🔐 Security
 
-- Change `DB_ADMIN_PASS` (admin token), `RPC_SECRET` and `S3_SECRET_KEY`
+- Change `DB_ADMIN_PASS` (admin token), `RPC_SECRET` (64 hex characters, for example `openssl rand -hex 32`) and `S3_SECRET_KEY`
   before the first start
 - `GARAGE_RPC_SECRET` is the cluster join secret; never share it
 - The S3 API is published on plain HTTP in the default file; terminate TLS in

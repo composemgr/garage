@@ -47,7 +47,7 @@ services:
       - traefik
 
   garage-server:
-    image: dxflrs/garage:latest
+    image: dxflrs/garage:v2.5.0
     container_name: garage-server
     domainname: ${BASE_DOMAIN_NAME:-example.com}
     hostname: garage-server
@@ -59,7 +59,7 @@ services:
       RUST_LOG: garage=info
       GARAGE_ADMIN_TOKEN: ${DB_ADMIN_PASS:-replace-with-a-random-password}
       GARAGE_METRICS_TOKEN: ${APP_API_TOKEN:-replace-with-a-random-password}
-      GARAGE_RPC_SECRET: ${RPC_SECRET:-replace-with-a-random-password}
+      GARAGE_RPC_SECRET: ${RPC_SECRET:-0000000000000000000000000000000000000000000000000000000000000000}
       CONTAINER_NAME: garage-server
       HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
     volumes:
